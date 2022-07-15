@@ -1,0 +1,44 @@
+[tool.poetry]
+name = "datacollector-api-client"
+version = "0.1.0"
+description = "Thin client for Azure Monitor DataCollector API."
+authors = ["Francisco Ruiz A <francisco@ltech.io>"]
+license = "MIT"
+readme = "README.rst"
+repository = "https://github.com/francisco-ltech/datacollector-api-client"
+keywords = [
+    "datacollector",
+    "azure",
+    "monitor",
+    "poetry",
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+requests = "^2.28.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+responses = "^0.21.0"
+requests-mock = "^1.9.3"
+flake8 = "^4.0.1"
+mypy = "^0.961"
+tox = "^3.25.1"
+types-requests = "^2.28.1"
+
+[build-system]
+requires = ["poetry>=1.1.13", "poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+check_untyped_defs = true
+disallow_any_generics = true
+ignore_missing_imports = true
+no_implicit_optional = true
+show_error_codes = true
+strict_equality = true
+warn_redundant_casts = true
+warn_return_any = true
+warn_unreachable = true
+warn_unused_configs = true
+no_implicit_reexport = true
