@@ -10,19 +10,17 @@ requests_test_data = [
 
 
 @pytest.mark.parametrize("expected_status_code, expected_response", requests_test_data)
-def test_post_data(requests_mock, expected_status_code, expected_response):
-    wrapper = DataCollectorWrapper('bcc5fbbb', '2KXEZcVf')
+def test_log_info(dbutils, requests_mock, expected_status_code, expected_response):
+    wrapper = DataCollectorWrapper('bcc5fbbb', '2KXEZcVf', dbutils)
 
     requests_mock.post(wrapper.get_uri(), status_code=expected_status_code)
 
-    data = {
+    data = [{
         "application": "thin",
         "message": "test_datacollector_api_client.py."
-    }
+    }]
 
-    data_json = json.dumps(data)
-
-    resp = wrapper.post_data('custom_log_table', data_json)
+    resp = wrapper.log_info(structured_log_message=data)
 
     assert expected_response in resp
 
@@ -34,17 +32,17 @@ signature_data = [
 
 
 @pytest.mark.parametrize("workspace_id, workspace_key, expected_error", signature_data)
-def test_post_data_signature_exception_error(requests_mock, workspace_id, workspace_key, expected_error):
+def test_signature_exception_error(dbutils, requests_mock, workspace_id, workspace_key, expected_error):
     """
     This test case covers scenarios when a request signature cannot be constructed due to bad parameters.
     """
 
-    wrapper = DataCollectorWrapper(workspace_id, workspace_key)
+    wrapper = DataCollectorWrapper(workspace_id, workspace_key, dbutils)
 
     requests_mock.post(wrapper.get_uri(), status_code=200)
 
     with pytest.raises(binascii.Error) as exc:
-        wrapper.post_data('INFO', '{"job": "ingestion"}')
+        wrapper.log_info(structured_log_message=[{"job": "ingestion"}])
 
     exception_message = exc.value.args[0]
     assert expected_error in exception_message
