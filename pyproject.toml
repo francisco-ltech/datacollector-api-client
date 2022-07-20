@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "datacollector-api-client"
-version = "0.1.0"
+version = "0.1.1"
 description = "Thin client for Azure Monitor DataCollector API."
 authors = ["Francisco Ruiz A <francisco@ltech.io>"]
 license = "MIT"
@@ -14,8 +14,9 @@ keywords = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = ">=3.8,<4.0"
 requests = "^2.28.1"
+pyspark = "^3.3.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
@@ -23,7 +24,6 @@ responses = "^0.21.0"
 requests-mock = "^1.9.3"
 flake8 = "^4.0.1"
 mypy = "^0.961"
-tox = "^3.25.1"
 types-requests = "^2.28.1"
 
 [build-system]
