@@ -17,16 +17,37 @@ Usage
 
 ::
 
-    import json
-    from datacollector_api_client import client
+    from datacollector_api_client.client import DataCollectorWrapper
 
-    data = {
-        "application": "your_application_name",
-        "message": "A log message."
-    }
+    wrapper = DataCollectorWrapper(LOGANALYTICS_WORKSPACE_ID, LOGANALYTICS_WORKSPACE_KEY)
 
-    data_json = json.dumps(data)
+    data = [{
+       "application": "my_app",
+       "message": "my log message"
+    }]
 
-    wrapper = client.DataCollectorWrapper("your_log_analytics_workspace_id", "your_log_analytics_workspace_key")
+    response = wrapper.log_info(structured_log_message=data)
+    print(response)
 
-    response = wrapper.post_data("custom_log_table_name", data_json)
+Enriching structured logging with Databricks information
+--------------------------------------------------------
+Pass your dbutils instance from your Databricks session to the library
+
+::
+
+    wrapper = DataCollectorWrapper(LOGANALYTICS_WORKSPACE_ID, LOGANALYTICS_WORKSPACE_KEY, dbutils)
+
+    data = [{
+       "application": "Notebook",
+       "message": f'Number of rows in dataframe: {df.count()}'
+    }]
+
+    response = wrapper.log_info(structured_log_message=data)
+    print(response)
+
+
+The following data is also collected and appended to your log:
+ - dbutils.notebook.entry_point.getDbutils().notebook().getContext().notebookPath().get()
+ - dbutils.notebook.entry_point.getDbutils().notebook().getContext().tags().apply('clusterId')
+ - dbutils.notebook.entry_point.getDbutils().notebook().getContext().tags().apply('sessionId')
+ - dbutils.notebook.entry_point.getDbutils().notebook().getContext().tags().apply('user')
