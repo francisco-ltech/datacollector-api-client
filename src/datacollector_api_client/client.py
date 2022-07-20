@@ -6,6 +6,8 @@ import json
 import requests
 import datetime
 
+from typing import List
+
 from datacollector_api_client.dbutils_proxy import DbUtilsProxy
 
 
@@ -31,7 +33,8 @@ class DataCollectorWrapper:
         """ Constructs all attributes for this instance
         :param workspace_id: The id of the Log Analytics workspace.
         :param workspace_key: The key of the Log Analytics workspace.
-        :param dbutils: The pyspark.dbutils.DBUtils instance from the consumer application
+        :param dbutils: The pyspark.dbutils.DBUtils instance from the consumer application,
+        dbx additional info will be collected
         """
 
         self.workspace_id = workspace_id
@@ -41,35 +44,34 @@ class DataCollectorWrapper:
     def get_uri(self):
         return f"https://{self.workspace_id}.ods.opinsights.azure.com/api/logs?api-version=2016-04-01"
 
-    def log_info(self, structured_log_message: [] = str,
-                 include_dbx_data: bool = True, log_type: str = "logs_info") -> str:
-        return self.__make_request(log_type, structured_log_message, include_dbx_data)
+    def log_info(self, structured_log_message: List[str], log_type: str = "logs_info") -> str:
+        return self.__make_request(log_type, structured_log_message)
 
-    def log_error(self, structured_log_message: [] = str,
-                  include_dbx_data: bool = True, log_type: str = "logs_info") -> str:
-        return self.__make_request(log_type, structured_log_message, include_dbx_data)
+    def log_error(self, structured_log_message: List[str], log_type: str = "logs_info") -> str:
+        return self.__make_request(log_type, structured_log_message)
 
-    def __make_request(self, log_type: str, structured_log_message: str, include_dbx_data) -> str:
+    def __make_request(self, log_type: str, structured_log_message: List[str]) -> str:
         """ Makes a POST Http Request to Azure DataCollector API
         :param log_type: The custom log table name in Log Analytics
         :param structured_log_message: More collected info form the consumer application
-        :param include_dbx_data: Indicates whether to include Databricks Notebook data
         :return: Accepted on success, Not Accepted upon failure
         """
 
-        if include_dbx_data:
-            dbx_data = self.__get_dbx_data()
+        if not structured_log_message:
+            raise ValueError('structured_log_message argument is empty.')
 
-        json_log = json.loads(dbx_data)
-
-        if structured_log_message is not None:
+        if self.dbutils is not None:
+            json_log = json.loads(self.__get_dbx_data())
             for log in structured_log_message:
                 json_log.update(json.loads(json.dumps(log)))
+            data = json.dumps([json_log])
+        else:
+            data = json.dumps(structured_log_message)
 
         method = 'POST'
         content_type = 'application/json'
         rfc1123date = datetime.datetime.utcnow().strftime('%a, %d %b %Y %H:%M:%S GMT')
-        content_length = len(json_log)
+        content_length = len(data)
         signature = self.__build_signature(rfc1123date, method, content_length, content_type, '/api/logs')
 
         headers = {
@@ -79,7 +81,7 @@ class DataCollectorWrapper:
             'x-ms-date': rfc1123date
         }
 
-        response = requests.post(self.get_uri(), data=json.dumps(json_log), headers=headers)
+        response = requests.post(self.get_uri(), data=data, headers=headers)
 
         if 200 <= response.status_code <= 299:
             return 'Accepted'
@@ -117,4 +119,3 @@ class DataCollectorWrapper:
                                         .digest()).decode('utf-8')
         authorization = f'SharedKey {self.workspace_id}:{encoded_hash}'
         return authorization
-
