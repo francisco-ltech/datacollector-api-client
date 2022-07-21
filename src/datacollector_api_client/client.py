@@ -6,7 +6,7 @@ import json
 import requests
 import datetime
 
-from typing import List
+from typing import List, Dict
 
 from datacollector_api_client.dbutils_proxy import DbUtilsProxy
 
@@ -44,13 +44,13 @@ class DataCollectorWrapper:
     def get_uri(self):
         return f"https://{self.workspace_id}.ods.opinsights.azure.com/api/logs?api-version=2016-04-01"
 
-    def log_info(self, structured_log_message: List[str], log_type: str = "logs_info") -> str:
+    def log_info(self, structured_log_message: List[Dict[str, str]], log_type: str = "logs_info") -> str:
         return self.__make_request(log_type, structured_log_message)
 
-    def log_error(self, structured_log_message: List[str], log_type: str = "logs_info") -> str:
+    def log_error(self, structured_log_message: List[Dict[str, str]], log_type: str = "logs_info") -> str:
         return self.__make_request(log_type, structured_log_message)
 
-    def __make_request(self, log_type: str, structured_log_message: List[str]) -> str:
+    def __make_request(self, log_type: str, structured_log_message: List[Dict[str, str]]) -> str:
         """ Makes a POST Http Request to Azure DataCollector API
         :param log_type: The custom log table name in Log Analytics
         :param structured_log_message: More collected info form the consumer application
