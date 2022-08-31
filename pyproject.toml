@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "datacollector-api-client"
-version = "0.1.3"
+version = "0.1.4"
 description = "Thin client for Azure Monitor DataCollector API."
 authors = ["Francisco Ruiz A <francisco@ltech.io>"]
 license = "MIT"
