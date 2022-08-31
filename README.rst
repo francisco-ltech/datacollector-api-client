@@ -29,6 +29,13 @@ Usage
     response = wrapper.log_info(structured_log_message=data)
     print(response)
 
+
+To log a message as error, use: *wrapper.log_error(structured_log_message=data)*
+
+You can also override the default name of the tables by setting parameter: *log_type="your_preferred_table_name"*
+
+
+
 Enriching structured logging with Databricks information
 --------------------------------------------------------
 Pass your dbutils instance from your Databricks session to the library

@@ -47,7 +47,7 @@ class DataCollectorWrapper:
     def log_info(self, structured_log_message: List[Dict[str, str]], log_type: str = "logs_info") -> str:
         return self.__make_request(log_type, structured_log_message)
 
-    def log_error(self, structured_log_message: List[Dict[str, str]], log_type: str = "logs_info") -> str:
+    def log_error(self, structured_log_message: List[Dict[str, str]], log_type: str = "logs_error") -> str:
         return self.__make_request(log_type, structured_log_message)
 
     def __make_request(self, log_type: str, structured_log_message: List[Dict[str, str]]) -> str:
@@ -95,11 +95,11 @@ class DataCollectorWrapper:
         :return: A json string
         """
         return json.dumps({
-                "application": DbUtilsProxy.get_notebook(self.dbutils),
-                "cluster_id": DbUtilsProxy.get_cluster_id(self.dbutils),
-                "session_id": DbUtilsProxy.get_session_id(self.dbutils),
-                "actor": DbUtilsProxy.get_current_user(self.dbutils)
-            })
+            "application": DbUtilsProxy.get_notebook(self.dbutils),
+            "cluster_id": DbUtilsProxy.get_cluster_id(self.dbutils),
+            "session_id": DbUtilsProxy.get_session_id(self.dbutils),
+            "actor": DbUtilsProxy.get_current_user(self.dbutils)
+        })
 
     def __build_signature(self, date: str, method: str, content_length: int, content_type: str, resource: str) -> str:
         """ Builds the signature required to make a Http Request to the DataCollectorAPI
